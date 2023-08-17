@@ -3,7 +3,7 @@
 void printBackward(char string[]);
 
 int main(void) {
-    char string[] = "Muhammet Yusuf Karaaslan";
+    char string[] = "Hello World";
     printBackward(string);
     puts("");
 }
