@@ -5,6 +5,9 @@
 
 typedef int ItemType;
 
+enum command {INSERT = 1, DELETE, END};
+typedef enum command Command;
+
 struct node {
     struct node* leftPtr;
     ItemType data;
@@ -24,23 +27,34 @@ void updateNode(NodePtr nodePtr, NodePtr left, ItemType value, NodePtr right);
 void insert(TreePtr treePtr, ItemType value);
 void delete(TreePtr treePtr, ItemType value);
 void inOrderTraversal(NodePtr nodePtr);
-ItemType getItemType(void);
+ItemType getItemTypeRandomly(void);
 void printItemType(ItemType value);
 void fillTreeRandomly(TreePtr treePtr, int numberOfElements);
+ItemType getItemType(void);
 
 int main(void) {
     srand(time(NULL));
     Tree myTree = {NULL};
-    fillTreeRandomly(&myTree, 20);
+    fillTreeRandomly(&myTree, 10);
     inOrderTraversal(myTree.rootPtr);
+    puts("\n");
+    
+    while(myTree.rootPtr != NULL) {
+        printf("%s", "Enter the item to be deleted: ");
+        ItemType value = getItemType();
+        delete(&myTree, value);
+        inOrderTraversal(myTree.rootPtr);
+        puts("\n");
+    }
 }
 
 void delete(TreePtr treePtr, ItemType value) {
     void deleteRecursively(NodePtr nodePtr, ItemType value);
+    void removeNodePtr(NodePtr* nodePtrPtr);
     
     if (!isEmpty(treePtr->rootPtr)) {
         if (treePtr->rootPtr->data == value) {
-            
+            removeNodePtr(&treePtr->rootPtr);
         }
         else {
             deleteRecursively(treePtr->rootPtr, value);
@@ -51,7 +65,7 @@ void delete(TreePtr treePtr, ItemType value) {
 void deleteRecursively(NodePtr nodePtr, ItemType value) {
     void removeNodePtr(NodePtr* nodePtrPtr);
     
-    if (value < nodePtr->data) {
+    if (value <= nodePtr->data) {
         if (!isEmpty(nodePtr->leftPtr)) {
             if (nodePtr->leftPtr->data == value) {
                 removeNodePtr(&nodePtr->leftPtr);
@@ -91,7 +105,6 @@ void removeNodePtr(NodePtr* nodePtrPtr) {
         (*nodePtrPtr)->data = tempPtr->data;
         deleteRecursively(*nodePtrPtr, tempPtr->data);
     }
-    
 }
 
 void insert(TreePtr treePtr, ItemType value) {
@@ -113,7 +126,8 @@ void insertRecursively(NodePtr nodePtr, ItemType value) {
         }
         else {
             nodePtr->rightPtr = malloc(sizeof(Node));
-            updateNode(nodePtr->rightPtr, NULL, value, NULL);
+            if (!isEmpty(nodePtr->rightPtr))
+                updateNode(nodePtr->rightPtr, NULL, value, NULL);
         }
     }
     else if (value < nodePtr->data) {
@@ -122,7 +136,8 @@ void insertRecursively(NodePtr nodePtr, ItemType value) {
         }
         else {
             nodePtr->leftPtr = malloc(sizeof(Node));
-            updateNode(nodePtr->leftPtr, NULL, value, NULL);
+            if (!isEmpty(nodePtr->leftPtr))
+                updateNode(nodePtr->leftPtr, NULL, value, NULL);
         }
     }
 }
@@ -141,8 +156,14 @@ void printItemType(ItemType value) {
     printf("%d", value);
 }
 
+ItemType getItemTypeRandomly(void) {
+    return rand() % 10;
+}
+
 ItemType getItemType(void) {
-    return rand() % 20;
+    ItemType value;
+    scanf("%d", &value);
+    return value;
 }
 
 void inOrderTraversal(NodePtr nodePtr) {
@@ -158,7 +179,7 @@ void fillTreeRandomly(TreePtr treePtr, int numberOfElements) {
     puts("The numbers placed in the tree are:");
     
     for (int i = 0; i < numberOfElements; i++) {
-        ItemType value = getItemType();
+        ItemType value = getItemTypeRandomly();
         printItemType(value);
         printf(" ");
         insert(treePtr, value);
